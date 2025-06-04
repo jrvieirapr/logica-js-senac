@@ -5,7 +5,8 @@ const telefoneInput = document.getElementById("telefone");
 const adcionarButton = document.getElementById("adcionar");
 const tabelaBody = document.getElementById("tabela-contatos");
 // Variaveis da Tabela
-const linhas = []
+const linhas = [];
+let indexEdicao = null;
 
 function mostrarMensagem(mensagem) {
   console.log(mensagem);
@@ -29,45 +30,90 @@ nomeInput.addEventListener("keyup", (e) => {
 
 //Eventos de mouse
 nomeInput.addEventListener("mouseenter", () => {
-    mostrarMensagem('O mouse esta em cima do campo');
+  mostrarMensagem("O mouse esta em cima do campo");
 });
 nomeInput.addEventListener("mouseleave", () => {
-    mostrarMensagem('O mouse saiu do campo');
+  mostrarMensagem("O mouse saiu do campo");
 });
 nomeInput.addEventListener("mousedown", () => {
-    mostrarMensagem('Cliquei com o mouse');
+  mostrarMensagem("Cliquei com o mouse");
 });
 nomeInput.addEventListener("mouseup", () => {
-    mostrarMensagem('Soltou o botão do mouse');
+  mostrarMensagem("Soltou o botão do mouse");
 });
 nomeInput.addEventListener("click", () => {
-    mostrarMensagem('clicou no campo');
+  mostrarMensagem("clicou no campo");
 });
 
-function montarLinhas(){
-    for(let linha of linhas){
-        console.log(linha)
-    }
+function montarLinhas() {
+  for (let linha of linhas) {
+    console.log(linha);
+  }
 }
 // Botao Adcionar
 adcionarButton.addEventListener("click", () => {
-    mostrarMensagem("Cliquei");
-    const nome = nomeInput.value.trim()
-    const telefone = telefoneInput.value.trim()
-    if(!nome | !telefone){
-        alert("Preencha os campos!")
-        return
-    }
-    console.log(`Dados: \nNome: ${nome}. \nTelefone: ${telefone}`)
-    // "nome" : "Juliano"
-    linhas.push({nome,telefone})
-    console.log(linhas)
-    // limpar formulario
-    nomeInput.value = ""
-    telefoneInput.value = ""
-    nomeInput.focus()    
+  mostrarMensagem("Cliquei");
+  const nome = nomeInput.value.trim();
+  const telefone = telefoneInput.value.trim();
+  if (!nome | !telefone) {
+    alert("Preencha os campos!");
+    return;
+  }
+  console.log(`Dados: \nNome: ${nome}. \nTelefone: ${telefone}`);
+  // "nome" : "Juliano"
+  if (indexEdicao !== null) {
+    linhas[indexEdicao] = { nome, telefone };
+    indexEdicao = null
+    adcionarButton.textContent="Adicionar"
+  } else {
+    linhas.push({ nome, telefone });
+  }
+  console.log(linhas);
+  // limpar formulario
+  nomeInput.value = "";
+  telefoneInput.value = "";
+  nomeInput.focus();
+
+  renderizarTabela();
 });
 
-function renderizarTabela(){
-  
+function renderizarTabela() {
+  // Limpar a tabela
+  tabelaBody.innerHTML = "";
+  // iterar (laço de repeticao / loop)
+  linhas.forEach((linha, index) => {
+    // criando linha da tabela
+    const tr = document.createElement("tr");
+    //  inserir dentro tr os td
+    tr.innerHTML = `
+    <td>${linha.nome}</td>
+    <td>${linha.telefone}</td>
+    <td>
+      <button class="btn btn-sm btn-warning" 
+      onclick="editarLinhaArray(${index})">
+      Editar
+      </button>
+      <button class="btn btn-sm btn-danger" 
+      onclick="removerLinhaArray(${index})">
+      Remover
+      </button>
+    </td>
+    `;
+    tabelaBody.appendChild(tr);
+  });
+}
+
+function editarLinhaArray(index) {
+  console.log(`Editando: ${index}`);
+  const contato = linhas[index];
+  nomeInput.value = contato.nome;
+  telefoneInput.value = contato.telefone;
+  indexEdicao = index;
+  adcionarButton.textContent = "Salvar";
+}
+
+function removerLinhaArray(index) {
+  console.log(`Remover: ${index}`);
+  linhas.slice(index, 1);
+  renderizarTabela();
 }
